@@ -30,7 +30,7 @@ def result_data(dataset_folder, data_folder, output_folder, path_for_weight):
 				if lineNumber in [3]:
 					processLine = "batch=64"
 				if lineNumber in [4]:
-					processLine = "subdivisions=8"
+					processLine = "subdivisions=16"
 
 				if lineNumber in [610,696,783]:
 					processLine = "classes="+str(classCount)
