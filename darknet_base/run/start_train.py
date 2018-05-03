@@ -47,10 +47,12 @@ def main():
 		json.dump(result, file)
 
 
-	run_command('./darknet  detector train {} {} {} -gpus 1'.format(
+	run_command_str = './darknet  detector train {} {} {} -gpus 1'.format(
 		os.path.join(dataset_out_folder, 'obj.data'), 
 		os.path.join(dataset_out_folder, 'yolo-obj.cfg'),
-		os.path.join(data_folder, 'darknet53.conv.74')))
+		os.path.join(data_folder, 'darknet53.conv.74'))
+	print(run_command_str)
+	run_command(run_command_str)
 
 
 if __name__ == '__main__':
