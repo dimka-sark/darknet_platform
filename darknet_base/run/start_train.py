@@ -12,8 +12,8 @@ def run_command(command):
 		if output == '' and process.poll() is not None:
 			break
 		if output:
-			output = output.strip()
-			if output.startswith('!!!'):
+			print(output.strip())
+			if False and output.startswith('!!!'):
 				print(output)
 
 	rc = process.poll()
