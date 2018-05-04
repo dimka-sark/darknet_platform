@@ -1,11 +1,8 @@
 #include "darknet.h"
-#include <ctime>
+#include "time.h"
 
-long int unix_timestamp()
-{
-    time_t t = std::time(0);
-    long int now = static_cast<long int> (t);
-    return now;
+long int unix_timestamp() {
+    return (long int)time(NULL);
 }
 
 
