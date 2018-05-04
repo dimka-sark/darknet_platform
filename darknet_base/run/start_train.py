@@ -6,6 +6,7 @@ import shlex
 import subprocess
 
 def run_command(command):
+	return subprocess.call(shlex.split(command))
 	process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
 	while True:
 		output = process.stdout.readline()
@@ -24,6 +25,9 @@ def main():
 	dataset_out_folder = os.environ.get('TEMP_DATASET_PATH', 'D:\\Downloads\\yolo_prepare\\out')
 	data_folder = os.environ.get('IN_DATA_PATH', os.path.join(os.path.dirname(os.path.realpath(__file__)), 'all_data'))
 	weigth_out_put =  os.environ.get('TRAIN_PATH_TO_SAVE_RESULT', 'D:\\Downloads\\yolo_prepare\\out\\weights') 
+
+	save_step_count =  int(os.environ.get('SAVE_EACH_STEPS', 200))
+	min_loss =  float(os.environ.get('TRAIN_MIN_LOSS', 0.1))
 
 	prepare_dataset(zip_file_path, dataset_out_folder)
 	result_data(dataset_out_folder, data_folder, 
@@ -47,10 +51,12 @@ def main():
 		json.dump(result, file)
 
 
-	run_command_str = './darknet  detector train {} {} {} -gpus 1'.format(
+	run_command_str = './darknet  detector train {} {} {} -gpus 1 -save {} -loss {}'.format(
 		os.path.join(dataset_out_folder, 'obj.data'), 
 		os.path.join(dataset_out_folder, 'yolo-obj.cfg'),
-		os.path.join(data_folder, 'darknet53.conv.74'))
+		os.path.join(data_folder, 'darknet53.conv.74'),
+		save_step_count,
+		min_loss)
 	print(run_command_str)
 	run_command(run_command_str)
 

@@ -1,9 +1,20 @@
 #include "darknet.h"
+#include <ctime>
+
+long int unix_timestamp()
+{
+    time_t t = std::time(0);
+    long int now = static_cast<long int> (t);
+    return now;
+}
+
 
 static int coco_ids[] = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,31,32,33,34,35,36,37,38,39,40,41,42,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,67,70,72,73,74,75,76,77,78,79,80,81,82,84,85,86,87,88,89,90};
 
 
-void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear)
+
+
+void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear, int saveCount, float min_loss)
 {
     list *options = read_data_cfg(datacfg);
     char *train_images = option_find_str(options, "train", "data/train.list");
@@ -59,7 +70,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     double time;
     int count = 0;
     //while(i*imgs < N*120){
-    while(get_current_batch(net) < net->max_batches){
+    while(avg_loss <0 || avg_loss > min_loss){
         if(l.random && count++%10 == 0){
             printf("Resizing\n");
             int dim = (rand() % 10 + 10) * 32;
@@ -103,21 +114,17 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         avg_loss = avg_loss*.9 + loss*.1;
 
         i = get_current_batch(net);
-        printf("!!!|%ld|%f|%f|%f|%lf|%d\n", get_current_batch(net), loss, avg_loss, get_current_rate(net), what_time_is_it_now()-time, i*imgs);
-        if(i%100==0){
+        printf("[__nmprogress]{\"epoch\": 1, \"loss_batch\": %f, \"loss_epoch\": %f, \"step\": %ld, \"saved\": false, \"batch\": %ld}",  loss, avg_loss, get_current_batch(net),get_current_batch(net)/*,get_current_rate(net), what_time_is_it_now()-time, i*imgs*/);
+
+        if(i%saveCount==0){
 #ifdef GPU
             if(ngpus != 1) sync_nets(nets, ngpus, 0);
 #endif
             char buff[256];
-            sprintf(buff, "%s/%s.backup", backup_directory, base);
-            save_weights(net, buff);
-        }
-        if(i%10000==0 || (i < 1000 && i%100 == 0)){
-#ifdef GPU
-            if(ngpus != 1) sync_nets(nets, ngpus, 0);
-#endif
-            char buff[256];
-            sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
+
+            long int now = unix_timestamp();
+
+            sprintf(buff, "%s/%ld_%d.weights", backup_directory, now, i);
             save_weights(net, buff);
         }
         free_data(train);
@@ -776,6 +783,10 @@ void run_detector(int argc, char **argv)
     int cam_index = find_int_arg(argc, argv, "-c", 0);
     int frame_skip = find_int_arg(argc, argv, "-s", 0);
     int avg = find_int_arg(argc, argv, "-avg", 3);
+
+    float min_loss = find_float_arg(argc, argv, "-loss", .0001);
+
+    int saveCount = find_int_arg(argc, argv, "-save", 200);
     if(argc < 4){
         fprintf(stderr, "usage: %s %s [train/test/valid] [cfg] [weights (optional)]\n", argv[0], argv[1]);
         return;
@@ -816,7 +827,7 @@ void run_detector(int argc, char **argv)
     char *weights = (argc > 5) ? argv[5] : 0;
     char *filename = (argc > 6) ? argv[6]: 0;
     if(0==strcmp(argv[2], "test")) test_detector(datacfg, cfg, weights, filename, thresh, hier_thresh, outfile, fullscreen);
-    else if(0==strcmp(argv[2], "train")) train_detector(datacfg, cfg, weights, gpus, ngpus, clear);
+    else if(0==strcmp(argv[2], "train")) train_detector(datacfg, cfg, weights, gpus, ngpus, clear, saveCount, min_loss);
     else if(0==strcmp(argv[2], "valid")) validate_detector(datacfg, cfg, weights, outfile);
     else if(0==strcmp(argv[2], "valid2")) validate_detector_flip(datacfg, cfg, weights, outfile);
     else if(0==strcmp(argv[2], "recall")) validate_detector_recall(cfg, weights);

@@ -20,6 +20,10 @@ def result_data(dataset_folder, data_folder, output_folder, path_for_weight):
 	filtersCount = (classCount+5)*3
 	lineNumber=0
 
+	batch_size = os.environ.get('TRAIN_BATCH_SIZE',64) 
+	subdiv_size = os.environ.get('TRAIN_SUBDIV_SIZE',16) 
+	learning_rate = os.environ.get('LEARNING_RATE',0.0001) 
+
 	with open(os.path.join(data_folder, "yolov3.cfg"), 'r') as f:
 		with open(os.path.join(output_folder, "yolo-obj.cfg"), 'w') as f2:
 			for line in f:
@@ -28,9 +32,12 @@ def result_data(dataset_folder, data_folder, output_folder, path_for_weight):
 				processLine = line.strip()
 
 				if lineNumber in [3]:
-					processLine = "batch=64"
+					processLine = "batch={}".format(batch_size)
 				if lineNumber in [4]:
-					processLine = "subdivisions=16"
+					processLine = "subdivisions={}".format(subdiv_size)
+
+				if lineNumber in [18]:
+					processLine = "learning_rate={}".format(learning_rate)
 
 				if lineNumber in [610,696,783]:
 					processLine = "classes="+str(classCount)
