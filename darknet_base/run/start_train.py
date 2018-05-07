@@ -81,12 +81,12 @@ def main():
 	with open(save_to_one_file, 'w') as file:
 		json.dump(result, file)
 
-
+	path_to_start_weight = override_weight_path if override_weight_path else os.path.join(data_folder, 'darknet53.conv.74')
 	run_command_str = '{} detector train {} {} {} {}-save {} -loss {}'.format(
 		path_to_darknet_bin,
 		os.path.join(dataset_out_folder, 'obj.data'), 
 		os.path.join(dataset_out_folder, 'yolo-obj.cfg'),
-		os.path.join(data_folder, 'darknet53.conv.74'),
+		path_to_start_weight,
 		'',
 		save_step_count,
 		min_loss)
