@@ -111,7 +111,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         avg_loss = avg_loss*.9 + loss*.1;
 
         i = get_current_batch(net);
-        printf("[__nmprogress]{\"epoch\": 1, \"loss_batch\": %f, \"loss_epoch\": %f, \"step\": %ld, \"saved\": false, \"batch\": %ld}",  loss, avg_loss, get_current_batch(net),get_current_batch(net)/*,get_current_rate(net), what_time_is_it_now()-time, i*imgs*/);
+        printf("[__nmprogress]{\"epoch\": 1, \"loss_batch\": %f, \"loss_epoch\": %f, \"step\": %ld, \"saved\": false, \"batch\": %ld}\n",  loss, avg_loss, get_current_batch(net),get_current_batch(net)/*,get_current_rate(net), what_time_is_it_now()-time, i*imgs*/);
 
         if(i%saveCount==0){
 #ifdef GPU

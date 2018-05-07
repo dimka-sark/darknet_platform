@@ -48,7 +48,7 @@ def main():
 		with open(obj_names_path,'w') as file:
 			file.write(loaded_config['obj.names'])
 
-		with open(obj_config_path,'r') as file:
+		with open(obj_config_path,'w') as file:
 			file.write(loaded_config['yolo-obj.cfg'])
 
 
