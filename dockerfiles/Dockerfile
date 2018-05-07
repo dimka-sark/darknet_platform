@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir $WORKDIR_PATH \
     && cd $WORKDIR_PATH \
     && git clone https://github.com/dimka-sark/darknet_platform.git \
-    && cd darknet_platform \
+    && cd darknet_platform/darknet_base \
     && make -j $N_JOBS \
     && cd $WORKDIR_PATH/darknet_platform/darknet_base/run/all_data/ \
     && rm darknet53.conv.74 \
