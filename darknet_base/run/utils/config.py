@@ -8,7 +8,7 @@ def makedirs(path):
     if not os.path.isdir(path):
         os.makedirs(path) 
 
-def result_data(dataset_folder, data_folder, output_folder, path_for_weight):
+def result_data(dataset_folder, data_folder, output_folder, path_for_weight, generate_config=True):
 	classCount = 0
 	makedirs(output_folder)
 
@@ -24,28 +24,29 @@ def result_data(dataset_folder, data_folder, output_folder, path_for_weight):
 	subdiv_size = os.environ.get('TRAIN_SUBDIV_SIZE',16) 
 	learning_rate = os.environ.get('LEARNING_RATE',0.0001) 
 
-	with open(os.path.join(data_folder, "yolov3.cfg"), 'r') as f:
-		with open(os.path.join(output_folder, "yolo-obj.cfg"), 'w') as f2:
-			for line in f:
-				lineNumber+=1
+	if generate_config:
+		with open(os.path.join(data_folder, "yolov3.cfg"), 'r') as f:
+			with open(os.path.join(output_folder, "yolo-obj.cfg"), 'w') as f2:
+				for line in f:
+					lineNumber+=1
 
-				processLine = line.strip()
+					processLine = line.strip()
 
-				if lineNumber in [3]:
-					processLine = "batch={}".format(batch_size)
-				if lineNumber in [4]:
-					processLine = "subdivisions={}".format(subdiv_size)
+					if lineNumber in [3]:
+						processLine = "batch={}".format(batch_size)
+					if lineNumber in [4]:
+						processLine = "subdivisions={}".format(subdiv_size)
 
-				if lineNumber in [18]:
-					processLine = "learning_rate={}".format(learning_rate)
+					if lineNumber in [18]:
+						processLine = "learning_rate={}".format(learning_rate)
 
-				if lineNumber in [610,696,783]:
-					processLine = "classes="+str(classCount)
+					if lineNumber in [610,696,783]:
+						processLine = "classes="+str(classCount)
 
-				if lineNumber in [603,689,776]:
-					processLine = "filters="+str(filtersCount)
+					if lineNumber in [603,689,776]:
+						processLine = "filters="+str(filtersCount)
 
-				f2.write(processLine + '\n')
+					f2.write(processLine + '\n')	
 
 	makedirs(path_for_weight)
 	with open(os.path.join(output_folder, "obj.data"), 'w') as f:

@@ -12,7 +12,7 @@ def makedirs(path):
     if not os.path.isdir(path):
         os.makedirs(path) 
 
-def prepare_dataset(path_to_zip, out_folder, validate=False):
+def prepare_dataset(path_to_zip, out_folder, validate=False, load_mapping_from_file=False):
     makedirs(out_folder)
     with ZipFile(path_to_zip) as zip_file:
         annotaions_json = None
@@ -23,18 +23,31 @@ def prepare_dataset(path_to_zip, out_folder, validate=False):
         raw_images = annotaions_json['images']
         raw_anns = annotaions_json['annotations']
 
+        obj_name_file_path = os.path.join(out_folder, 'obj.names')
+
         innerIndex = 0
-        class_map = {}
-        names_array = []
+        class_map = {}        
 
-        for cl in annotaions_json['categories']:
-            class_map[cl["id"]] = {'index':innerIndex}
-            names_array.append(str(cl["id"]))
-            innerIndex+=1
-            pass
+        if load_mapping_from_file:
+            with open(obj_name_file_path, 'r') as f:
+                for line in f:
+                    sline = line.strip()
+                    if sline:
+                        class_map[sline] = {'index':innerIndex}
+                        innerIndex+=1
 
-        with open(os.path.join(out_folder, 'obj.names'), 'w') as f:
-            f.write("\n".join(names_array) + '\n')
+        else:
+            names_array = []
+            for cl in annotaions_json['categories']:
+                class_map[cl["id"]] = {'index':innerIndex}
+                names_array.append(str(cl["id"]))
+                innerIndex+=1
+                pass
+
+            with open(obj_name_file_path, 'w') as f:
+                f.write("\n".join(names_array) + '\n')
+
+        
 
 
         train_out_folder = os.path.join(out_folder, 'train')

@@ -26,7 +26,31 @@ def main():
 	data_folder = os.environ.get('IN_DATA_PATH', os.path.join(os.path.dirname(os.path.realpath(__file__)), 'all_data'))
 	weigth_out_put =  os.environ.get('TRAIN_PATH_TO_SAVE_RESULT', 'D:\\Downloads\\yolo_prepare\\out\\weights')
 
-	path_to_darknet_bin =  os.environ.get('DARKNET_BIN_PATH', '/yolo/darknet_platform/darknet_base/darknet') 
+	path_to_darknet_bin = os.environ.get('DARKNET_BIN_PATH', '/yolo/darknet_platform/darknet_base/darknet') 
+
+	override_weight_path = os.environ.get('TRAIN_PATH_TO_INIT', None) 
+
+	save_to_one_file = os.path.join(os.environ.get('MODEL_SAVE_DATA_PATH', 'D:\\Downloads\\yolo_prepare\\out') ,'all_cnn_net_info.json')
+	
+	obj_names_path = os.path.join(dataset_out_folder, 'obj.names')
+	obj_config_path = os.path.join(dataset_out_folder, 'yolo-obj.cfg')
+
+
+	load_mapping_from_file = False
+
+	if override_weight_path:
+		load_mapping_from_file = True
+		loaded_config = None
+		
+		with open(save_to_one_file, 'r') as file:
+			loaded_config = json.load(file)
+
+		with open(obj_names_path,'w') as file:
+			file.write(loaded_config['obj.names'])
+
+		with open(obj_config_path,'r') as file:
+			file.write(loaded_config['yolo-obj.cfg'])
+
 
 	visible_gpu = os.environ.get('CUDA_VISIBLE_DEVICES', None)
 	if visible_gpu:
@@ -37,21 +61,20 @@ def main():
 	save_step_count =  int(os.environ.get('SAVE_EACH_STEPS', 200))
 	min_loss =  float(os.environ.get('TRAIN_MIN_LOSS', 0.1))
 
-	prepare_dataset(zip_file_path, dataset_out_folder)
+	prepare_dataset(zip_file_path, dataset_out_folder, load_mapping_from_file=load_mapping_from_file)
 	result_data(dataset_out_folder, data_folder, 
-		dataset_out_folder, weigth_out_put)
+		dataset_out_folder, weigth_out_put, generate_config= (not load_mapping_from_file))
 
-	save_to_one_file = os.path.join(os.environ.get('MODEL_SAVE_DATA_PATH', 'D:\\Downloads\\yolo_prepare\\out') ,'all_cnn_net_info.json')
 
 	result = {}
 
 	with open(os.path.join(dataset_out_folder, 'obj.data'),'r') as file:
 		result['obj.data'] = file.read()
 
-	with open(os.path.join(dataset_out_folder, 'obj.names'),'r') as file:
+	with open(obj_names_path,'r') as file:
 		result['obj.names'] = file.read()
 
-	with open(os.path.join(dataset_out_folder, 'yolo-obj.cfg'),'r') as file:
+	with open(obj_config_path,'r') as file:
 		result['yolo-obj.cfg'] = file.read()
 
 
