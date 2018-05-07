@@ -8,9 +8,7 @@ export TRAIN_DATASET_PATH=/dataset2/validation.zip
 export TEMP_DATASET_PATH=/tmp
 export TRAIN_PATH_TO_SAVE_RESULT=/output
 export MODEL_SAVE_DATA_PATH=/output
-
-export MODEL_SAVE_DATA_PATH=/output
-export MODEL_SAVE_DATA_PATH=/output
+export CUDA_VISIBLE_DEVICES=1
 
 
 
@@ -20,3 +18,9 @@ rm darknet53.conv.74
 wget https://pjreddie.com/media/files/darknet53.conv.74
 cd /yolo2/darknet_platform/darknet_base/
 python3 run/start_train.py
+
+
+
+
+python3 darknet_base/run/start_train.py
+

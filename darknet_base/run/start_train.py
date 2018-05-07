@@ -64,7 +64,7 @@ def main():
 		os.path.join(dataset_out_folder, 'obj.data'), 
 		os.path.join(dataset_out_folder, 'yolo-obj.cfg'),
 		os.path.join(data_folder, 'darknet53.conv.74'),
-		visible_gpu,
+		'',
 		save_step_count,
 		min_loss)
 	print(run_command_str)
