@@ -28,6 +28,12 @@ def main():
 
 	path_to_darknet_bin =  os.environ.get('DARKNET_BIN_PATH', '/yolo/darknet_platform/darknet_base/darknet') 
 
+	visible_gpu = os.environ.get('CUDA_VISIBLE_DEVICES', None)
+	if visible_gpu:
+		visible_gpu = '-gpus {} '.format(visible_gpu)
+	else:
+		visible_gpu = ''
+
 	save_step_count =  int(os.environ.get('SAVE_EACH_STEPS', 200))
 	min_loss =  float(os.environ.get('TRAIN_MIN_LOSS', 0.1))
 
@@ -53,11 +59,12 @@ def main():
 		json.dump(result, file)
 
 
-	run_command_str = '{} detector train {} {} {} -save {} -loss {}'.format(
+	run_command_str = '{} detector train {} {} {} {}-save {} -loss {}'.format(
 		path_to_darknet_bin,
 		os.path.join(dataset_out_folder, 'obj.data'), 
 		os.path.join(dataset_out_folder, 'yolo-obj.cfg'),
 		os.path.join(data_folder, 'darknet53.conv.74'),
+		visible_gpu,
 		save_step_count,
 		min_loss)
 	print(run_command_str)
