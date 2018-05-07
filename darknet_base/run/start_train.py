@@ -24,7 +24,9 @@ def main():
 	zip_file_path = os.environ.get('TRAIN_DATASET_PATH', 'D:\\Downloads\\yolo_prepare\\validation.zip') 
 	dataset_out_folder = os.environ.get('TEMP_DATASET_PATH', 'D:\\Downloads\\yolo_prepare\\out')
 	data_folder = os.environ.get('IN_DATA_PATH', os.path.join(os.path.dirname(os.path.realpath(__file__)), 'all_data'))
-	weigth_out_put =  os.environ.get('TRAIN_PATH_TO_SAVE_RESULT', 'D:\\Downloads\\yolo_prepare\\out\\weights') 
+	weigth_out_put =  os.environ.get('TRAIN_PATH_TO_SAVE_RESULT', 'D:\\Downloads\\yolo_prepare\\out\\weights')
+
+	path_to_darknet_bin =  os.environ.get('DARKNET_BIN_PATH', '/yolo/darknet_platform/darknet_base/darknet') 
 
 	save_step_count =  int(os.environ.get('SAVE_EACH_STEPS', 200))
 	min_loss =  float(os.environ.get('TRAIN_MIN_LOSS', 0.1))
@@ -51,7 +53,8 @@ def main():
 		json.dump(result, file)
 
 
-	run_command_str = './darknet  detector train {} {} {} -gpus 1 -save {} -loss {}'.format(
+	run_command_str = '{} detector train {} {} {} -save {} -loss {}'.format(
+		path_to_darknet_bin,
 		os.path.join(dataset_out_folder, 'obj.data'), 
 		os.path.join(dataset_out_folder, 'yolo-obj.cfg'),
 		os.path.join(data_folder, 'darknet53.conv.74'),
