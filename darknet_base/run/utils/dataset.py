@@ -39,7 +39,7 @@ def prepare_dataset(path_to_zip, out_folder, validate=False, load_mapping_from_f
         else:
             names_array = []
             for cl in annotaions_json['categories']:
-                class_map[cl["id"]] = {'index':innerIndex}
+                class_map[str(cl["id"])] = {'index':innerIndex}
                 names_array.append(str(cl["id"]))
                 innerIndex+=1
                 pass
@@ -78,7 +78,7 @@ def prepare_dataset(path_to_zip, out_folder, validate=False, load_mapping_from_f
                 ann = raw_anns[anns_offset]
                 if raw_anns[anns_offset]['image_id'] != image_info['id']:
                     break 
-                map_index = class_map[ann["category_id"]]['index']
+                map_index = class_map[str(ann["category_id"])]['index']
 
                 new_width = ann['bbox'][2]/image_width
                 new_height = ann['bbox'][3]/image_height
